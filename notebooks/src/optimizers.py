@@ -90,3 +90,61 @@ class Adam(Optimizer):
         v_hat = self.v / (1 - self.beta2**self.t)
         learning_rate = self.get_lr()
         return weights - learning_rate * m_hat / (np.sqrt(v_hat) + self.epsilon)
+
+
+class RMSprop(Optimizer):
+    def __init__(
+        self,
+        lr=0.01,
+        rho=0.9,
+        epsilon=1e-8,
+        l2_lambda=0.01,
+        momentum=0.9,
+        decay_rate=0.96,
+        decay_steps=1000,
+        warmup_steps=1000,
+        max_lr=0.1,
+    ):
+        super().__init__(
+            lr, l2_lambda, momentum, decay_rate, decay_steps, warmup_steps, max_lr
+        )
+        self.rho = rho
+        self.epsilon = epsilon
+        self.square_avg = 0
+
+    def update(self, weights, gradients):
+        gradients += self.l2_lambda * weights
+        self.square_avg = self.rho * self.square_avg + (1 - self.rho) * (
+            gradients**2
+        )
+        learning_rate = self.get_lr()
+        return weights - learning_rate * gradients / (
+            np.sqrt(self.square_avg) + self.epsilon
+        )
+
+
+class Adagrad(Optimizer):
+    def __init__(
+        self,
+        lr=0.01,
+        epsilon=1e-8,
+        l2_lambda=0.01,
+        momentum=0.9,
+        decay_rate=0.96,
+        decay_steps=1000,
+        warmup_steps=1000,
+        max_lr=0.1,
+    ):
+        super().__init__(
+            lr, l2_lambda, momentum, decay_rate, decay_steps, warmup_steps, max_lr
+        )
+        self.epsilon = epsilon
+        self.sum_squares = 0
+
+    def update(self, weights, gradients):
+        gradients += self.l2_lambda * weights
+        self.sum_squares += gradients**2
+        learning_rate = self.get_lr()
+        return weights - learning_rate * gradients / (
+            np.sqrt(self.sum_squares) + self.epsilon
+        )

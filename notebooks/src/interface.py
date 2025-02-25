@@ -1,24 +1,31 @@
 import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
-from optimizers import SGD, Adam
+from optimizers import SGD, Adam, RMSprop, Adagrad
 from loss_functions import (
     quadratic_loss,
     rastrigin_loss,
     rosenbrock_loss,
+    cross_entropy_loss,
+    hinge_loss,
     quadratic_loss_gradient,
     rastrigin_loss_gradient,
     rosenbrock_loss_gradient,
+    cross_entropy_loss_gradient,
+    hinge_loss_gradient,
 )
 
 st.title("Optimization Visualization in Machine Learning")
 
-optimizer_name = st.selectbox("Choose the optimizer:", ["SGD", "Adam"])
+optimizer_name = st.selectbox(
+    "Choose the optimizer:", ["SGD", "Adam", "RMSprop", "Adagrad"]
+)
 learning_rate = st.slider("Learning rate", 0.001, 1.0, 0.1)
 num_iterations = st.slider("Number of iterations", 10, 100, 50)
 
 loss_function_name = st.selectbox(
-    "Choose the loss function:", ["Quadratic", "Rastrigin", "Rosenbrock"]
+    "Choose the loss function:",
+    ["Quadratic", "Rastrigin", "Rosenbrock", "Cross-Entropy", "Hinge"],
 )
 
 if loss_function_name == "Quadratic":
@@ -27,14 +34,27 @@ if loss_function_name == "Quadratic":
 elif loss_function_name == "Rastrigin":
     loss_function = rastrigin_loss
     loss_gradient = rastrigin_loss_gradient
-else:
+elif loss_function_name == "Rosenbrock":
     loss_function = rosenbrock_loss
     loss_gradient = rosenbrock_loss_gradient
+elif loss_function_name == "Cross-Entropy":
+    loss_function = cross_entropy_loss
+    loss_gradient = cross_entropy_loss_gradient
+elif loss_function_name == "Hinge":
+    loss_function = hinge_loss
+    loss_gradient = hinge_loss_gradient
 
 np.random.seed(42)
 weights = np.random.randn(2)
 
-optimizer = SGD(lr=learning_rate) if optimizer_name == "SGD" else Adam(lr=learning_rate)
+if optimizer_name == "SGD":
+    optimizer = SGD(lr=learning_rate)
+elif optimizer_name == "Adam":
+    optimizer = Adam(lr=learning_rate)
+elif optimizer_name == "RMSprop":
+    optimizer = RMSprop(lr=learning_rate)
+elif optimizer_name == "Adagrad":
+    optimizer = Adagrad(lr=learning_rate)
 history = []
 
 for _ in range(num_iterations):
