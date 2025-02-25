@@ -5,26 +5,31 @@ from optimizers import SGD, Adam
 from loss_functions import (
     quadratic_loss,
     rastrigin_loss,
+    rosenbrock_loss,
     quadratic_loss_gradient,
     rastrigin_loss_gradient,
+    rosenbrock_loss_gradient,
 )
 
-st.title("Visualização da Otimização em Machine Learning")
+st.title("Optimization Visualization in Machine Learning")
 
-optimizer_name = st.selectbox("Escolha o otimizador:", ["SGD", "Adam"])
-learning_rate = st.slider("Taxa de aprendizado", 0.001, 1.0, 0.1)
-num_iterations = st.slider("Número de iterações", 10, 100, 50)
+optimizer_name = st.selectbox("Choose the optimizer:", ["SGD", "Adam"])
+learning_rate = st.slider("Learning rate", 0.001, 1.0, 0.1)
+num_iterations = st.slider("Number of iterations", 10, 100, 50)
 
 loss_function_name = st.selectbox(
-    "Escolha a função de perda:", ["Quadrática", "Rastrigin"]
+    "Choose the loss function:", ["Quadratic", "Rastrigin", "Rosenbrock"]
 )
 
-if loss_function_name == "Quadrática":
+if loss_function_name == "Quadratic":
     loss_function = quadratic_loss
     loss_gradient = quadratic_loss_gradient
-else:
+elif loss_function_name == "Rastrigin":
     loss_function = rastrigin_loss
     loss_gradient = rastrigin_loss_gradient
+else:
+    loss_function = rosenbrock_loss
+    loss_gradient = rosenbrock_loss_gradient
 
 np.random.seed(42)
 weights = np.random.randn(2)
@@ -39,9 +44,9 @@ for _ in range(num_iterations):
 
 fig = go.Figure(
     layout=go.Layout(
-        title="Otimização dos Pesos",
-        xaxis=dict(range=[-2, 2], title="Peso 1"),
-        yaxis=dict(range=[-2, 2], title="Peso 2"),
+        title="Weight Optimization",
+        xaxis=dict(range=[-2, 2], title="Weight 1"),
+        yaxis=dict(range=[-2, 2], title="Weight 2"),
         showlegend=False,
         updatemenus=[
             dict(
